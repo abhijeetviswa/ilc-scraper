@@ -1,3 +1,4 @@
+import os
 import re
 import subprocess as sp
 import tempfile
@@ -12,6 +13,18 @@ from utils import find_startswith, sp_args
 
 TEMP_DIR = tempfile.TemporaryDirectory(prefix="ilc-scraper")
 TEMP_DIR_PATH = Path(TEMP_DIR.name)
+
+
+class ExtendedSimpleHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def __init__(self, *args, directory=None, **kwargs):
+        self.directoryt = directory
+        super().__init__(*args, **kwargs)
+
+    def do_GET(self):
+        pwd = os.getcwd()
+        os.chdir(self.directoryt)
+        super().do_GET()
+        os.chdir(pwd)
 
 
 class DirServer(Process):
@@ -36,7 +49,7 @@ class DirServer(Process):
             assert self.dir.exists()
 
         SimpleHTTPRequestHandler.log_message = lambda *a, **kw: None
-        handler_class = partial(SimpleHTTPRequestHandler, directory=self.dir)
+        handler_class = partial(ExtendedSimpleHTTPRequestHandler, directory=self.dir)
         self.server = HTTPServer(("localhost", 0), handler_class)
         self.port = self.server.server_port
 
@@ -176,7 +189,7 @@ def download_stream(token, stream_url, output_file: Path, quality="720p", angle=
 
     print("Downloading using ffmpeg")
     # TODO: Display ffmpeg download progress by parsing output
-    proc = sp.run(cmd, text=True, **sp_args)
+    proc = sp.run(cmd, **sp_args)
     if proc.returncode:
         print("ffmpeg error:", proc.stderr, "for", output_file.name)
     else:
