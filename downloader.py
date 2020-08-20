@@ -156,8 +156,6 @@ def download_stream(token, stream_url, output_file: Path, quality="720p", angle=
     print("Processing", output_file.name)
     cmd = [
         "ffmpeg",
-        "-loglevel",
-        "error",
     ]
     variant_pls = get_variant_playlist(stream_url, quality)
     if not variant_pls:

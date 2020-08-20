@@ -73,9 +73,9 @@ def make_subprocess_args():
     env["PATH"] = env["PATH"] + sep + sep.join(sys.path)
     args = {
         "close_fds": True,
-        "stdin": subprocess.PIPE,
-        "stderr": subprocess.PIPE,
-        "stdout": subprocess.PIPE,
+        # "stdin": subprocess.PIPE,
+        # "stderr": subprocess.PIPE,
+        # "stdout": subprocess.PIPE,
         "startupinfo": si,
         "env": env,
     }
